@@ -35,19 +35,52 @@ The backend separates HTTP endpoints (`WeatherController`), application orchestr
 
 ## Run without Docker
 
-For backend development, install JDK 17 and Maven, then run from `backend/`:
+Install JDK 17, Maven, and Node.js 22. Open two terminals from the project root.
 
-```sh
+**Terminal 1 — backend:**
+
+```powershell
+Set-Location .\backend
 mvn test
 mvn spring-boot:run
 ```
 
-For frontend development, install Node.js 22 and run from `frontend/`:
+The API listens on `http://localhost:8080`. Its local CORS allowlist defaults to the Vite origin `http://localhost:5173`. To allow a different origin, set `WEATHER_CORS_ALLOWED_ORIGINS` to a comma-separated list before starting Spring Boot.
 
-```sh
+**Terminal 2 — frontend:**
+
+```powershell
+Set-Location .\frontend
 npm ci
 npm test -- --run
 npm run dev
 ```
 
-Vite proxies `/api` to `http://localhost:8080` during development. The Compose setup builds and tests the backend image and serves the production frontend build.
+Open `http://localhost:5173`. Vite hot-reloads frontend changes.
+
+## Environment-specific API URL
+
+The frontend reads `VITE_API_BASE_URL` from Vite's mode-specific env files:
+
+- `.env.development` is used by `npm run dev` and points directly to `http://localhost:8080/api`. Spring allows the Vite origin through its configured CORS allowlist.
+- `.env.production` is used by `npm run build` and defaults to `/api`, which Nginx proxies to the backend in Docker Compose.
+
+To point a production build at a separately hosted API, create `frontend/.env.production.local` (ignored by Git) with, for example:
+
+```dotenv
+VITE_API_BASE_URL=https://weather-api.example.com/api
+```
+
+Then rebuild the frontend. Vite embeds `VITE_*` values in the generated JavaScript at build time, so these values are public and must not contain secrets. A separately hosted API must allow the frontend's origin via `WEATHER_CORS_ALLOWED_ORIGINS`. For a Compose image build, you can override the API base with `VITE_API_BASE_URL=https://weather-api.example.com/api` in the environment running `docker compose build`.
+
+## Run and debug both apps in VS Code
+
+Install the **Extension Pack for Java** and make sure JDK 17 and Maven are available to VS Code. Open this project root as the workspace. Choose **Weather Atlas (full stack)** from Run and Debug and press **F5**:
+
+- VS Code builds and starts the Spring Boot API in a Java debug session.
+- A background task starts the Vite server, then opens the app in Chrome with frontend source-map debugging.
+- Java breakpoints work in backend source; browser breakpoints work in frontend TypeScript/React source. Stop the compound session to stop both.
+
+You can also launch **Weather API (Spring Boot)** alone and start Vite separately with `npm run dev`. The launch configurations and Vite task are in `.vscode/launch.json` and `.vscode/tasks.json`.
+
+For frontend-only checks, run `npm test -- --run` and `npm run build` from `frontend/`. For backend checks, run `mvn test` from `backend/`.

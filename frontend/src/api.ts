@@ -1,5 +1,7 @@
 import type { CityLocation, WeatherForecast } from "./types";
 
+const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || "/api").replace(/\/$/, "");
+
 async function getJson<T>(url: string): Promise<T> {
   const response = await fetch(url);
   if (!response.ok) {
@@ -11,7 +13,7 @@ async function getJson<T>(url: string): Promise<T> {
 
 export function searchLocations(query: string): Promise<CityLocation[]> {
   const params = new URLSearchParams({ query });
-  return getJson<CityLocation[]>(`/api/weather/locations?${params}`);
+  return getJson<CityLocation[]>(`${apiBaseUrl}/weather/locations?${params}`);
 }
 
 export function getForecast(location: CityLocation): Promise<WeatherForecast> {
@@ -20,5 +22,5 @@ export function getForecast(location: CityLocation): Promise<WeatherForecast> {
     longitude: String(location.longitude),
     name: [location.name, location.region, location.country].filter(Boolean).join(", "),
   });
-  return getJson<WeatherForecast>(`/api/weather/forecast?${params}`);
+  return getJson<WeatherForecast>(`${apiBaseUrl}/weather/forecast?${params}`);
 }
