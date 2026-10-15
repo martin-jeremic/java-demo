@@ -59,8 +59,8 @@ describe("Weather Atlas", () => {
     });
     fireEvent.click(screen.getByRole("button", { name: "Search cities" }));
 
-    const result = await screen.findByRole("button", { name: /Copenhagen Capital Region, Denmark/ });
-    fireEvent.click(result);
+    const cityName = await screen.findByText("Copenhagen", { selector: "strong" });
+    fireEvent.click(cityName.closest("button")!);
 
     expect(await screen.findByRole("heading", { name: "Copenhagen" })).toBeInTheDocument();
     expect(screen.getByText("Five-day outlook")).toBeInTheDocument();

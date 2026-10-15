@@ -35,7 +35,7 @@ The backend separates HTTP endpoints (`WeatherController`), application orchestr
 
 ## Run without Docker
 
-Install JDK 17, Maven, and Node.js 22. Open two terminals from the project root.
+Install JDK 25 (LTS), Maven 3.10.0, and Node.js 24 (LTS, pinned in `.nvmrc`). Spring Boot 4.1.1 supports Java 25. Open two terminals from the project root.
 
 **Terminal 1 — backend:**
 
@@ -75,7 +75,7 @@ Then rebuild the frontend. Vite embeds `VITE_*` values in the generated JavaScri
 
 ## Run and debug both apps in VS Code
 
-Install the **Extension Pack for Java** and make sure JDK 17 and Maven are available to VS Code. Open this project root as the workspace. Choose **Weather Atlas (full stack)** from Run and Debug and press **F5**:
+Install the **Extension Pack for Java** and make sure JDK 25 and Maven 3.10.0 are available to VS Code. Open this project root as the workspace. Choose **Weather Atlas (full stack)** from Run and Debug and press **F5**:
 
 - VS Code builds and starts the Spring Boot API in a Java debug session.
 - A background task starts the Vite server, then opens the app in Chrome with frontend source-map debugging.
